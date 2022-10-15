@@ -1,20 +1,16 @@
-using Services;
+using Interactables;
+using UI;
 using UnityEngine;
 
-namespace Installers
+public class Bootstrap : MonoBehaviour
 {
-    public class Bootstrap : MonoBehaviour
-    {
-        private void Awake()
-        {
-            BindIUpdate();
-        }
+    [SerializeField] private InputFieldsReader _inputMenu;
+    [SerializeField] private ObjectSpawner _spawner;
+    [SerializeField] private ObjectsPool _pool;
 
-        private void BindIUpdate()
-        {
-            var go = new GameObject();
-            go.name = "Updater";
-            go.AddComponent<Updater>();
-        }
+    private void Start()
+    {
+        _spawner.SetPool(_pool);
+        _inputMenu.FieldsChangeEvent += _spawner.OnFieldsChange;
     }
 }

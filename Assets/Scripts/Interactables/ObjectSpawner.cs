@@ -3,43 +3,74 @@ using UnityEngine;
 
 namespace Interactables
 {
-    public class ObjectSpawner : MonoBehaviour, IUpdatable
+    public class ObjectSpawner : MonoBehaviour
     {
-        [SerializeField] private ObjectsPool _pool;
+        private IObjectPool _pool;
+        
+        private Vector3 _createdObjectDestination;
+        private int _createdObjectSpeed;
+        private int _spawnTime;
         private float _timer;
-    
-        public float spawnTime;
-        public float spawnObjectSpeed;
-        public Vector3 spawnObjectDistance;
 
         private void Start()
         {
-            _timer = spawnTime;
-            Spawn();
+            InitFields();
+        }
+
+        private void InitFields()
+        {
+            _createdObjectDestination = Vector3.zero;
+            _createdObjectSpeed = 0;
+            _spawnTime = 0;
+            _timer = 0;
+        }
+
+        private void Update()
+        {
+            if (_pool == null)
+                return;
+      
+            _timer -= Time.deltaTime;
+
+            if (_spawnTime != 0 && _timer <= 0)
+            {
+                Spawn();
+                _timer = _spawnTime;
+            }
         }
 
         private void Spawn()
         {
             var newSpawnObject = _pool.GetFreeObject();
             newSpawnObject.transform.position = Vector3.zero;
+            newSpawnObject.transform.rotation = Quaternion.identity;
         
             var spawnObjectComponent = newSpawnObject.GetComponent<ISpawnObject>();
 
             if (spawnObjectComponent != null)
-                spawnObjectComponent.Init(spawnObjectSpeed, spawnObjectDistance);
+                spawnObjectComponent.Init(_createdObjectSpeed, _createdObjectDestination);
             else
                 newSpawnObject.SetActive(false);
         }
 
-        public void Tick()
+        public void SetPool(IObjectPool pool)
         {
-            _timer -= Time.deltaTime;
+            _pool = pool;
+        }
 
-            if (_timer <= 0)
+        public void OnFieldsChange(int speed, int spawnTime, Vector3 distance)
+        {
+            if (speed != 0)
+                _createdObjectSpeed = speed;
+
+            if (spawnTime != 0)
             {
-                Spawn();
-                _timer = spawnTime;
+                _spawnTime = spawnTime;
+                _timer = 0;
             }
+            
+            if(distance.x != 0 || distance.z != 0)
+                _createdObjectDestination = distance;
         }
     }
 }

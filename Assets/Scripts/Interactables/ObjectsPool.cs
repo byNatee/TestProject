@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
+using Interfaces;
 using UnityEngine;
 
 namespace Interactables
 {
-    public class ObjectsPool : MonoBehaviour
+    public class ObjectsPool : MonoBehaviour, IObjectPool
     {
         [SerializeField] private GameObject _objectPrefab;
         [SerializeField] private Transform _container;
